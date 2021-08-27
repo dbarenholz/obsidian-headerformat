@@ -1,112 +1,56 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { getHeaderLevel } from "helpers";
+import { FormattingHotkey } from "hotkeys";
+import { Plugin } from "obsidian";
 
-interface MyPluginSettings {
-	mySetting: string;
-}
+/**
+ * The plugin class, extends Obsidian Plugin.
+ *
+ * @author dbarenholz
+ * @version 0.0.1
+ */
+export default class HeaderformatPlugin extends Plugin {
+  async onload() {
+    console.log("Obsidian Header Format: loaded plugin.");
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
+    // Add 6 commands for the 6 headers.
+    for (let i = 1; i < 7; i++) {
+      this.addCommand({
+        id: `format-h${i}`,
+        name: `H${i}`,
+        hotkeys: [new FormattingHotkey(i)],
+        editorCallback: (editor, _) => {
+          // Retrieve current line
+          const { line } = editor.getCursor();
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+          const contents = editor.getDoc().getLine(line);
+          const start = { line, ch: 0 };
+          const end = { line, ch: contents.length };
+          const content = editor.getRange(start, end);
 
-	async onload() {
-		console.log('loading plugin');
+          let replaceWithMe = null;
+          let headerPrefix = "#".repeat(i);
 
-		await this.loadSettings();
+          const level = getHeaderLevel(content);
+          if (level == i) {
+            // Current line is already current header level: toggle
+            replaceWithMe = content.replace(new RegExp(`^${headerPrefix} `, `i`), "").trimStart();
+          } else {
+            // Current line is not yet current header level: apply
+            if (level == 0) {
+              replaceWithMe = `${headerPrefix} ${content}`;
+            } else {
+              replaceWithMe = content.replace(new RegExp(`^#+`, `i`), `${headerPrefix}`);
+            }
+          }
 
-		this.addRibbonIcon('dice', 'Sample Plugin', () => {
-			new Notice('This is a notice!');
-		});
+          // Replace particular range
+          editor.replaceRange(replaceWithMe, start, end);
+        },
+      });
+    }
+  }
 
-		this.addStatusBarItem().setText('Status Bar Text');
-
-		this.addCommand({
-			id: 'open-sample-modal',
-			name: 'Open Sample Modal',
-			// callback: () => {
-			// 	console.log('Simple Callback');
-			// },
-			checkCallback: (checking: boolean) => {
-				let leaf = this.app.workspace.activeLeaf;
-				if (leaf) {
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		this.registerCodeMirror((cm: CodeMirror.Editor) => {
-			console.log('codemirror', cm);
-		});
-
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-	}
-
-	onunload() {
-		console.log('unloading plugin');
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		let {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		let {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue('')
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
+  onunload() {
+    console.log("Obsidian Plaintext: unloaded plugin.");
+  }
 }

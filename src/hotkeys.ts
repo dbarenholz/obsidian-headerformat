@@ -11,7 +11,7 @@ export class FormattingHotkey implements Hotkey {
   modifiers: Modifier[];
 
   constructor(headerLevel: number) {
-    this.modifiers = ["Ctrl"];
+    this.modifiers = ["Mod"];
     this.key = `${headerLevel}`;
   }
 }

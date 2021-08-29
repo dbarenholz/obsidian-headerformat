@@ -1,5 +1,5 @@
-import { getHeaderLevel } from "helpers";
-import { FormattingHotkey } from "hotkeys";
+import { getHeaderLevel } from "./helpers";
+import { FormattingHotkey } from "./hotkeys";
 import { Plugin } from "obsidian";
 
 /**
@@ -27,7 +27,7 @@ export default class HeaderformatPlugin extends Plugin {
           const end = { line, ch: contents.length };
           const content = editor.getRange(start, end);
 
-          let replaceWithMe = null;
+          let replaceWithMe: string = null;
           let headerPrefix = "#".repeat(i);
 
           const level = getHeaderLevel(content);

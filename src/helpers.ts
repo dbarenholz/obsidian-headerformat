@@ -4,7 +4,7 @@
  * @param line string on which we want to find its header level
  * @returns the header level of the line
  */
-export function getHeaderLevel(line: string) {
+export function getHeaderLevel(line: string): number {
   const HEADER_CHAR = "#";
   let count = 0;
 

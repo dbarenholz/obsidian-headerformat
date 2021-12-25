@@ -10,7 +10,7 @@ import { Plugin } from "obsidian";
  * If you use CTRL+0, it sets the line to normal text.
  *
  * @author dbarenholz
- * @version 0.0.2
+ * @version 0.1.0
  */
 export default class HeaderformatPlugin extends Plugin {
   async onload() {

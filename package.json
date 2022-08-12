@@ -1,6 +1,6 @@
 {
   "name": "obsidian-headerformat",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Plugin for Obsidian (https://obsidian.md) to format current line as headers.",
   "main": "main.js",
   "scripts": {
